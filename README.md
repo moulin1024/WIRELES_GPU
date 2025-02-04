@@ -1,5 +1,5 @@
 ## WIRELES-GPU
-@author: Mou Lin (mou.lin@epfl.ch),Tristan Revaz(tristan.revaz@epfl.ch)
+@author: Mou Lin (mou.lin@epfl.ch) (solver), Tristan Revaz(tristan.revaz@epfl.ch) (python shell)
 ![Farmers Market Finder Demo](./animation.gif)
 
 ### Introduction
