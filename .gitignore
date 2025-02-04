@@ -13,7 +13,6 @@ job/*
 *.npy
 *.txt
 *.bin
-*.csv
 *.h5
 check.sh
 *.ipynb
