@@ -26,14 +26,14 @@ z_i		= 1000.0	# normalization height
 l_r		= 1		# ratio of streamwise to spanwise dimensions
 
 # custom
-lx		= 768		# length of dom in the streamwise dir
-ly		= 768		# length of dom in the spanwise dir
-lz		= 767.25	    # length of dom in the wall-normal dir
-bl_height = 767.25   # sqrt wall shear = sqrt(tau_0)
+lx		= 2048		# length of dom in the streamwise dir
+ly		= 2048		# length of dom in the spanwise dir
+lz		= 512	    # length of dom in the wall-normal dir
+bl_height = 500   # sqrt wall shear = sqrt(tau_0)
 
 nx		= 256		# number of grid points in the streamwise dir
 ny		= 256		# number of grid points in the spanwise dir
-nz		= 1024		# number of grid points in the wall-normal dir
+nz		= 256		# number of grid points in the wall-normal dir
 
 ########################################################################################################################
 # time (dt=dtr*u_star/z_i, dtr=dt*z_i/u_star)
@@ -44,9 +44,9 @@ time_flag	= 1		# 0 = native, 1 = custom
 dt		= 0.001		# non-dim timestep (dt=dtr*u_star/z_i)
 
 # custom
-dtr		= 0.015		# dim. timestep (dt=dtr*u_star/z_i)
+dtr		= 0.01		# dim. timestep (dt=dtr*u_star/z_i)
 
-nsteps	= 2001		# number of timesteps
+nsteps	= 30001		# number of timesteps
 
 ########################################################################################################################
 # bc
@@ -57,7 +57,7 @@ u_fric          = 0.4         # sqrt wall shear = sqrt(tau_0)
 ########################################################################################################################
 # sgs
 ########################################################################################################################
-model		= 4		    # 1 = smag, 2 = la-dyn, 3 = lasd
+model		= 3		    # 1 = smag, 2 = la-dyn, 3 = lasd
 fgr		    = 1.5		# ratio of filter to grid
 tfr		    = 2.0		# ratio of test filter to grid filter
 cs_count	= 10		# frequency of sgs coefficients update
@@ -66,7 +66,7 @@ cs_count	= 10		# frequency of sgs coefficients update
 # turbine
 ########################################################################################################################
 turb_flag	    = 1 	    # 0 = without turbine, 1 = with turbine
-turb_nb         = 1         # turbine number
+turb_nb         = 3         # turbine number
 turb_i          = 129       # turbine i loc
 turb_j          = 65        # turbine j loc
 turb_r          = 64        # turbine radius
@@ -79,8 +79,8 @@ tow_c           = 1.0           # tower drag coeff
 nac_r           = 2       #  nacelle radius
 nac_c           = 1.0          # nacelle drag coeff
 yaw_angle       = 0.0      # yaw_angle
-turb_count	    = 2		        # frequency of turbine force update
-dyn_yaw_freq    = (/0.0/)      # yaw_angle
+turb_count	    = 1		        # frequency of turbine force update
+dyn_yaw_freq    = (/0.0,0.0,0.0/)      # yaw_angle
 ########################################################################################################################
 # precursor
 ########################################################################################################################
@@ -121,5 +121,5 @@ ts_tstart	= 1		# t start of ts_output (ts_tstart-1 must be multiple of c_count)
 ########################################################################################################################
 # exec
 ########################################################################################################################
-job_np		= 2     	# numer of processors (<= nz/2!, nz2=nz/nprocs+2)
+job_np		= 1     	# numer of processors (<= nz/2!, nz2=nz/nprocs+2)
 job_time	= 04:00:00	# duration of job

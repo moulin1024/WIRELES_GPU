@@ -284,6 +284,23 @@ module turbine
             sum_ker = 0
             call force_projection_pre<<<grid_full,tBlock_full>>>(sum_ker,turb_loc)
         end if
+        ! Compute the force on the blade elements
+        ! w0 = turb_w(i_turb)
+        ! turb_w(i_turb) = turb_w(i_turb)*60.d0/(2.d0*pi)
+        ! turb_w(i_turb)=turb_w(i_turb)+0.5*( &
+        !     +7.655D-11*(1.0*SUMQ(i_turb)/(10**3))**4 &
+        !     -1.584D-7*(1.0*SUMQ(i_turb)/(10**3))**3 &
+        !     +0.0001041*(1.0*SUMQ(i_turb)/(10**3))**2 &
+        !     -0.01292*(1.0*SUMQ(i_turb)/(10**3)) &
+        !     +12.37-turb_w(i_turb))
+
+        ! turb_w(i_turb) = turb_w(i_turb)*2.d0*pi/60.d0 
+                            
+        ! err = abs(1-w0/turb_w(i_turb)) 
+        ! iter_turb_w = iter_turb_w +1.d0
+        
+        ! abs_turb_w(i_turb) = abs(turb_w(i_turb))
+        ! sign_turb_w(i_turb) = sign(1.d0,turb_w(i_turb))
 
         
         do iter = 1,20
@@ -477,6 +494,10 @@ module turbine
         CTU = u(nint((turb_loc(i_turb,1)-hub_tower_gap*cos(turb_loc(i_turb,4)))/dx),nint((turb_loc(i_turb,2)-hub_tower_gap*sin(turb_loc(i_turb,4)))/dy),hub_k(i_turb))*lz1(i_turb) + &
               u(nint((turb_loc(i_turb,1)-hub_tower_gap*cos(turb_loc(i_turb,4)))/dx),nint((turb_loc(i_turb,2)-hub_tower_gap*sin(turb_loc(i_turb,4)))/dy),hub_k(i_turb)+1)*lz2(i_turb)
 
+        ! Streamwise velocity i0 grid in front of the nacelle
+        ! CTUin(i_turb) = u(nint(nint(turb_loc(i_turb,1)/dx)*dx/dx)-i0,nint(nint(turb_loc(i_turb,2)/dy)*dy/dy),hub_k(i_turb))*lz1(i_turb) + &
+        ! u(nint(nint(turb_loc(i_turb,1)/dx)*dx/dx)-i0,nint(nint(turb_loc(i_turb,2)/dy)*dy/dy),hub_k(i_turb)+1)*lz2(i_turb)
+
         ! Drag force of the nacelle
         CTFx = 0.5_fp*(CTU**2)*nac_c(i_turb)*dA_nacell(i_turb)/(dx*dy*dz)
         
@@ -524,6 +545,7 @@ module turbine
         solidity(i_r,i_turb) = 3._fp*chord_length/(2._fp*pi*r(i_r))
     
         ! blade element centre location
+        ! print *,0.7/z_i/dx
         blade_ii    = turb_loc(i_turb,1)/dx-(hub_tower_gap*cos(turb_loc(i_turb,4)))/dx - r(i_r)*cos_Tang(i_phi)/dx*sin(turb_loc(i_turb,4))
         blade_jj    = turb_loc(i_turb,2)/dy-(hub_tower_gap*sin(turb_loc(i_turb,4)))/dy + r(i_r)*cos_Tang(i_phi)/dy*cos(turb_loc(i_turb,4))
         blade_kk_w  = turb_loc(i_turb,3)/dz + r(i_r)*sin_Tang(i_phi)/dz + 2._fp
@@ -588,8 +610,8 @@ module turbine
                 coord_z_w = coord_z_u - 0.5*dz
 
                 ! Apply gaussian smoothing kernel
-                sigma_x  = sqrt((r(i_r)*dang)**2+dr**2)
-                sigma_yz = sqrt((r(i_r)*dang)**2+dr**2)
+                sigma_x  = 2*dx!sqrt((r(i_r)*dang)**2+dr**2)
+                sigma_yz = 2*dx!sqrt((r(i_r)*dang)**2+dr**2)
 
                 tmp1   = 1._fp/(sigma_yz**2*sigma_x*sqrt(pi)**3)
                 tmp2   = -1._fp
@@ -754,15 +776,17 @@ module turbine
                 coord_z_w = coord_z_u - 0.5*dz
 
                 ! Distance to the hub
+                ! r_u  = sqrt(((coord_y+coord_x*tan(turb_loc(i_turb,4)))*cos(turb_loc(i_turb,4)))**2 + coord_z_u**2)
+                ! r_w  = sqrt(((coord_y+coord_x*tan(turb_loc(i_turb,4)))*cos(turb_loc(i_turb,4)))**2 + coord_z_w**2)
+
                 r_u  = sqrt((coord_y/cos(turb_loc(i_turb,4)))**2 + coord_z_u**2)
                 r_w  = sqrt((coord_y/cos(turb_loc(i_turb,4)))**2 + coord_z_w**2)
-
                 ! Phase angle of the grid point
                 sin_CTangx = coord_z_u/(r_u+1e-16)
                 cos_CTangz = ((coord_y)/cos(turb_loc(i_turb,4)))/(r_w+1e-16)
 
-                sigma_x  = sqrt((r(i_r)*dang)**2+dr**2)
-                sigma_yz = sqrt((r(i_r)*dang)**2+dr**2)
+                sigma_x  = 2*dx!sqrt((r(i_r)*dang)**2+dr**2)
+                sigma_yz = 2*dx!sqrt((r(i_r)*dang)**2+dr**2)
 
                 tmp1   = 1._fp/(sigma_yz**2*sigma_x*sqrt(pi)**3)
                 tmp2   = -1._fp
