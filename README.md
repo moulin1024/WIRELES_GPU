@@ -5,7 +5,7 @@
 ### Introduction
 WIRELES-GPU is a large-eddy simulation code written in CUDA Fortran for simulating atmospheric boundary layer flows. It solves the filtered continuity equation and the filtered Navier-Stokes equations (using the Boussinesq approximation). The numerical method used in this code is based on the PhD thesis of Albertson, 1996 [1].
 
-Its main features can be summarized as follows: It uses a second-order Adams–Bashforth explicit scheme for time advancement and a hybrid pseudospectral finite-difference scheme for the spatial discretization. The lateral boundary conditions are periodic. The top boundary condition is set up as a flux-free condition. The bottom boundary condition requires the calculation of the instantaneous surface shear stress, which is accomplished through the local application of Monin–Obukhov similarity theory. The SGS fluxes of momentum are parameterized using Lagrangian scale-dependent dynamic models [2]. 
+Its main features can be summarized as follows: It uses a second-order Adams–Bashforth explicit scheme for time advancement and a hybrid pseudospectral finite-difference scheme for the spatial discretization. The lateral boundary conditions are periodic. The top boundary condition is set up as a flux-free condition. The bottom boundary condition requires the calculation of the instantaneous surface shear stress, which is accomplished through the local application of Monin–Obukhov similarity theory. The SGS fluxes of momentum are parameterized using Lagrangian scale-dependent dynamic models [2] [3]. 
 
 ### Code structure:
 
@@ -51,7 +51,9 @@ To make life easier, a bash script *test_run.sh* has been provided to allow the 
    
 ### Reference
    [1] Albertson, J.D., 1996. Large eddy simulation of land-atmosphere interaction. University of California, Davis.
+
+   [2] Porté-Agel, F., Meneveau, C., & Parlange, M. B. (2000). A scale-dependent dynamic model for large-eddy simulation: application to a neutral atmospheric boundary layer. Journal of Fluid Mechanics, 415, 261-284.
    
-   [2] Bou-Zeid, E., Meneveau, C. and Parlange, M., 2005. A scale-dependent Lagrangian dynamic model for large eddy simulation of complex turbulent flows. Physics of fluids, 17(2), p.025105.
+   [3] Bou-Zeid, E., Meneveau, C. and Parlange, M., 2005. A scale-dependent Lagrangian dynamic model for large eddy simulation of complex turbulent flows. Physics of fluids, 17(2), p.025105.
 
 
