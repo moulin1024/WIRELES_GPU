@@ -498,8 +498,6 @@ subroutine open_turb(me)
             form='unformatted', access='stream')
         open (unit=(82000),file=('output/phase_angle.bin'), status='unknown',&
             form='unformatted', access='stream')
-        open (unit=(83000),file=('output/inflow.bin'), status='unknown',&
-            form='unformatted', access='stream')   
         open (unit=(90000), FILE="output/ta_power.dat")  
     end if
 
@@ -642,7 +640,7 @@ subroutine write_log(log_ustar,log_umax,me)
 
 end subroutine write_log
 
-subroutine write_turb_alm(CTF,displacement_host,moment_host,velocity_host,me)
+subroutine write_turb(CTF,displacement_host,moment_host,velocity_host,me)
 
     implicit none
     integer me,nall
@@ -660,20 +658,8 @@ subroutine write_turb_alm(CTF,displacement_host,moment_host,velocity_host,me)
         write (80000) velocity_host(:,:,:,2)
     end if
 
-end subroutine write_turb_alm
+end subroutine write_turb
 
-subroutine write_turb_rigid(CTF_host,me)
-
-    implicit none
-    integer me,nall
-    real(fp), dimension(n_phi,n_r,n_turb,2) , intent(in):: CTF_host
-    
-    if (me == 0) then
-        write (73000) CTF_host(:,:,:,1)*dx*dy*dz*z_i**2
-        write (74000) CTF_host(:,:,:,2)*dx*dy*dz*z_i**2
-    end if
-
-end subroutine write_turb_rigid
 
 !-------------------------------------------------------------------------------
 ! close output
@@ -811,14 +797,14 @@ subroutine recompose_ta2(me)
 
 end subroutine recompose_ta2
 
-subroutine recompose_ts1(me,t)
+subroutine recompose_ts1(me)
 
     implicit none
-    integer me,nall,t
+    integer me,nall
 
-    call recompose_ts('ts_u.bin', me,t)
-    call recompose_ts('ts_v.bin', me,t)
-    call recompose_ts('ts_w.bin', me,t)
+    call recompose_ts('ts_u.bin', me)
+    call recompose_ts('ts_v.bin', me)
+    call recompose_ts('ts_w.bin', me)
     ! call recompose_ts('ts_q.bin', me)
 
     ! call recompose_ts('ts_fx.bin', me)
@@ -866,35 +852,33 @@ subroutine recompose_ta(fname, me)
 
 end subroutine recompose_ta
 
-subroutine recompose_ts(fname, me,t)
+subroutine recompose_ts(fname, me)
 
     !---------------------------------------------------------------------------
     ! declaration
     implicit none
-    integer me,nall,t
+    integer me,nall
     character(*), intent(in) :: fname
     integer :: p
     character(3) :: f
-    real(fp), allocatable :: q(:,:,:)
-    character(3) :: ftime
+    real(fp), allocatable :: q(:,:,:,:)
 
     !---------------------------------------------------------------------------
     ! main code
 
     if (me == 0) then
         
-        allocate(q(ts_nx,ts_ny,ts_kend))
+        allocate(q(ts_nx,ts_ny,ts_kend,ts_ns))
         ! loop over processor files
         do p = 0,(ts_kend/nzb -1)
             write(f,'(i3.3)'), p
             open (unit=(99),file=('output/p'//trim(f)//'_'//fname), status='old', form='unformatted', access='stream')
-            read (99) q(:,:,(nzb*p+1):(nzb*(p+1)))
+            read (99) q(:,:,(nzb*p+1):(nzb*(p+1)),:)
             close((99), status ='delete')
         end do
 
         ! save new file
-        write(ftime,'(i3.3)'),(t-ts_tstart)/100 
-        open (unit=99,file=('output/'//ftime//'_'//fname), status='unknown', form='unformatted', access='stream')
+        open (unit=99,file=('output/'//fname), status='unknown', form='unformatted', access='stream')
         write (99) q
         close(99)
 
@@ -1076,7 +1060,7 @@ subroutine read_inflow(u,v,w,t,me)
     if (mod(t-1,inflow_count)==0) then
         i_batch = mod((t-1)/(inflow_count),batch_size) + 1
         ! Cycling inflow section: 10 times per p_count
-        cyc_pt = mod((t-1)/(inflow_count*20),ny)+1
+        cyc_pt = mod((t-1)/(inflow_count*4),ny)+1
         ! cyc_pt = ny
         prec_u(:,1:cyc_pt,:)    = u_batch(:,(ny-cyc_pt+1):ny,:,i_batch)
         prec_v(:,1:cyc_pt,:)    = v_batch(:,(ny-cyc_pt+1):ny,:,i_batch)

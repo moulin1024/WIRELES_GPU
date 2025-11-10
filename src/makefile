@@ -9,7 +9,11 @@ FC = mpif90
 ################################################################################
 
 FFLAGS = -O3 -Mpreprocess # -mcmodel=medium
-CUDA = -Mcuda -lcufft -ta=nvidia
+CUDA = -cuda -gpu=cc86 -acc
+# Auto-detect HPC SDK path for cuFFT library (old -Mcuda flag did this automatically)
+# If CUDA_HOME is set, use it; otherwise use HPC SDK default path
+CUDA_LIB_PATH = $(if $(CUDA_HOME),$(CUDA_HOME)/lib64,/opt/nvidia/hpc_sdk/Linux_x86_64/24.9/REDIST/math_libs/12.6/targets/x86_64-linux/lib)
+CUDA_LIBS = -L$(CUDA_LIB_PATH) -lcufft
 # debug
 # -check bounds -debug all -traceback -fpe0 fp-stack-check -debug inline-debug-info -parallel-source-info=2 -warn all
 
@@ -33,12 +37,12 @@ PROG = wireles_src
 DEP0  =   precision.o
 DEP1  =   dimen.o cufft_m.o
 DEP2  =   update.o convection.o derivative.o filter.o io.o pressure.o rhs.o time.o control.o structural.o rotation.o
-DEP3  =   divergence.o turbine_alm_nrel.o
+DEP3  =   divergence.o turbine_alm_nrel_new.o
 DEP4  =   sgs.o sgs_mgm.o wall.o
 
 
 ifdef USE_NVTX
-	FFLAGS += -DUSE_NVTX -lnvToolsExt -L$(CUDA_HOME)/lib64/
+	FFLAGS += -DUSE_NVTX -lnvToolsExt -L$(CUDA_LIB_PATH)/
 	DEP0   += nvtx.o
 endif
 
@@ -48,7 +52,7 @@ OBJ   = $(DEPS) main.o
 
 # --- link ---
 $(PROG):$(OBJ) main.o
-	$(FC) $(FFLAGS) $(CUDA) $(OBJ) -o $(PROG) $(INC) $(LIBS)
+	$(FC) $(FFLAGS) $(CUDA) $(OBJ) -o $(PROG) $(INC) $(CUDA_LIBS) $(LIBS)
 
 # --- compile ---
 main.o: main.cuf $(DEPS)

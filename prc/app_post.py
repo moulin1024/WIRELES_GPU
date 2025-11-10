@@ -176,7 +176,6 @@ def get_turb(src_out_path, config):
     turb['velocity_flap']  = fctlib.load_4d('blade_velocity_flap', int((config['nsteps']-1)/(config['turb_count']))+1,3,32,config['turb_nb'], config['double_flag'], src_out_path)
     turb['velocity_edge']  = fctlib.load_4d('blade_velocity_edge', int((config['nsteps']-1)/(config['turb_count']))+1,3,32,config['turb_nb'], config['double_flag'], src_out_path)
     turb['phase']  = fctlib.load_4d('phase_angle', int((config['nsteps']-1)/(config['turb_count']))+1,1,3,config['turb_nb'], config['double_flag'], src_out_path)
-    turb['inflow']  = fctlib.load_4d('inflow', int((config['nsteps']-1)/(config['turb_count']))+1,1,3,config['turb_nb'], config['double_flag'], src_out_path)
     
     return turb
 
@@ -432,7 +431,7 @@ def plot_pr_uvw(space, result_pr, config, out_path):
     plt.subplots_adjust(hspace=0.2)
 
     ax = plt.subplot(231)
-    plt.semilogy(result_pr['u_avg_c']/config['u_fric'], space['z_c']/config['l_z'], 'k.')
+    plt.plot(result_pr['u_avg_c']/config['u_fric'], space['z_c']/config['l_z'], 'k')
     plt.xlabel(r'$\bar{u}/u_*$')
     plt.ylabel(r'$z/H$')
     ax.xaxis.set_major_locator(plt.MaxNLocator(3))
@@ -440,7 +439,6 @@ def plot_pr_uvw(space, result_pr, config, out_path):
     plt.grid(b=True, which='both')
 
     hub_k = int(config['turb_z']/config['dz'])-1
-    print(hub_k)
     print(result_pr['u_avg_c'][hub_k])
 
     ax = plt.subplot(232)
