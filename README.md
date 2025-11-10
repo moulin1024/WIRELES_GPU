@@ -25,11 +25,11 @@ WireLES2/
 ### How to run
 Run the following line in the terminal first or add it in ~/.bashrc :
 ```bash
-alias wireles='python prc/wireles.py'
+alias wl='python prc/wl.py'
 ```
 then you can run various of application with the line
 ```bash
-wireles [applications name] [case name]
+wl [applications name] [case name]
 ```
 applications list:
 - create: create case with dummy default file
@@ -38,13 +38,15 @@ applications list:
 - edit: edit config file
 - pre: pre-process case
 - solve: submit case to the cluster through the slurm 
-- debug: run the case on the local machine or cluster interactive debug mode
-- make: compile the case
+- run: run the case on the local machine or cluster interactive debug mode (formerly debug)
+- build: compile the case (formerly make)
 - post: quick build-in post processing of the simulation data
 - anime: produce an animation of the flow from instant fields output
 - h5gen: generating self-explained hdf5 file of the simulation data for customized postprocessing
 
-A simple workflow: create --> edit --> pre --> solve/debug --> post/anime
+Note: The old commands `make` and `debug` still work for backward compatibility.
+
+A simple workflow: create --> edit --> pre --> solve/run --> post/anime
  
 To make life easier, a bash script *test_run.sh* has been provided to allow the new user to run a example case easily. 
 
